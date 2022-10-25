@@ -1,20 +1,24 @@
 from fastapi import FastAPI
 import subprocess
 
+from pydantic import BaseModel
+
 app = FastAPI()
 
 
-@app.post("register_asset_id")
-async def liquid_register_asset_id(asset_id: str):
-    register_asset_id(asset_id)
+class RegisterRequest(BaseModel):
+    asset_id: str
+    contract: dict
 
 
-@app.post("register_asset_id")
-async def liquid_register_asset_id_blockstream(asset_id: str, contract: dict):
-    register_asset_id_on_liquid(asset_id, contract)
+@app.post("/register_asset")
+async def register_asset_id(request_body: RegisterRequest):
+    register_asset_id_local(request_body.asset_id)
+    register_asset_id_on_liquid(request_body.asset_id, request_body.contract)
+    return request_body
 
 
-def register_asset_id(asset_id: str):
+def register_asset_id_local(asset_id: str):
     asset_id_string = 'Authorize linking the domain name lab.r3c.network to the Liquid asset ' + asset_id
     result = subprocess.run(['sudo', 'touch', '/var/www/html/.well-known/liquid-asset-proof-' + asset_id],
                             stdout=subprocess.PIPE)
