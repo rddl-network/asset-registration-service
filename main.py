@@ -14,7 +14,7 @@ class RegisterRequest(BaseModel):
 @app.post("/register_asset")
 async def register_asset_id(request_body: RegisterRequest):
     register_asset_id_local(request_body.asset_id)
-    register_asset_id_on_liquid(request_body.asset_id, request_body.contract)
+    # register_asset_id_on_liquid(request_body.asset_id, request_body.contract)
     return request_body
 
 
