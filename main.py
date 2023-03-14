@@ -1,9 +1,14 @@
 import json
+import subprocess
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import subprocess
-
 from pydantic import BaseModel
+from decouple import config
+
+ASSET_REG_URL: str = config("ASSET_REG_URL", default="https://assets.blockstream.info")
+LOCAL_STORAGE_LOCATION: str = config("LOCAL_STORAGE_LOCATION", default="/var/www/html")
+
+
 
 app = FastAPI()
 
@@ -33,7 +38,7 @@ async def register_asset_id(request_body: RegisterRequest):
 
 def register_asset_id_local(asset_id: str):
     try:
-        f = open('/var/www/html/.well-known/liquid-asset-proof-' + asset_id, "w")
+        f = open(F'{LOCAL_STORAGE_LOCATION}/.well-known/liquid-asset-proof-' + asset_id, "w")
         f.write('Authorize linking the domain name lab.r3c.network to the Liquid asset ' + asset_id)
         f.close()
     except Exception as e:
@@ -52,7 +57,7 @@ def schedule_task( task_array:list ):
 def register_asset_id_on_liquid(asset_id: str, contract: dict):
     contract = json.dumps(contract)
     input_json = F'{{"asset_id":"{asset_id}","contract":{contract}}}'
-    register_request = ['tsp', 'curl', 'https://assets.blockstream.info/', '-H', "Content-Type: application/json", '-d',
+    register_request = ['tsp', 'curl', F'{ASSET_REG_URL}', '-H', "Content-Type: application/json", '-d',
                         F"{input_json}"]
     schedule_task( ['tsp', 'sleep', '15m'])
     schedule_task( register_request)
