@@ -9,7 +9,6 @@ ASSET_REG_URL: str = config("ASSET_REG_URL", default="https://assets.blockstream
 LOCAL_STORAGE_LOCATION: str = config("LOCAL_STORAGE_LOCATION", default="/var/www/html")
 
 
-
 app = FastAPI()
 
 app.add_middleware(
@@ -19,6 +18,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 class RegisterRequest(BaseModel):
     asset_id: str
@@ -33,13 +33,13 @@ async def register_asset_id(request_body: RegisterRequest):
     if register_asset_id_local(request_body.asset_id):
         print(f"File succesffully written: {request_body.asset_id}")
     register_asset_id_on_liquid(request_body.asset_id, request_body.contract)
-    return {"asset_id": request_body.asset_id }
+    return {"asset_id": request_body.asset_id}
 
 
 def register_asset_id_local(asset_id: str):
     try:
-        f = open(F'{LOCAL_STORAGE_LOCATION}/.well-known/liquid-asset-proof-' + asset_id, "w")
-        f.write('Authorize linking the domain name lab.r3c.network to the Liquid asset ' + asset_id)
+        f = open(f"{LOCAL_STORAGE_LOCATION}/.well-known/liquid-asset-proof-" + asset_id, "w")
+        f.write("Authorize linking the domain name lab.r3c.network to the Liquid asset " + asset_id)
         f.close()
     except Exception as e:
         print(f"File Write execption: {e}")
@@ -47,18 +47,25 @@ def register_asset_id_local(asset_id: str):
     return True
 
 
-def schedule_task( task_array:list ):
+def schedule_task(task_array: list):
     register_response = subprocess.run(task_array, stdout=subprocess.PIPE)
     if register_response.returncode == 0:
-        print(register_response.stdout.decode('ASCII'))
+        print(register_response.stdout.decode("ASCII"))
     else:
         print(register_response.returncode)
 
+
 def register_asset_id_on_liquid(asset_id: str, contract: dict):
     contract = json.dumps(contract)
-    input_json = F'{{"asset_id":"{asset_id}","contract":{contract}}}'
-    register_request = ['tsp', 'curl', F'{ASSET_REG_URL}', '-H', "Content-Type: application/json", '-d',
-                        F"{input_json}"]
-    schedule_task( ['tsp', 'sleep', '15m'])
-    schedule_task( register_request)
-
+    input_json = f'{{"asset_id":"{asset_id}","contract":{contract}}}'
+    register_request = [
+        "tsp",
+        "curl",
+        f"{ASSET_REG_URL}",
+        "-H",
+        "Content-Type: application/json",
+        "-d",
+        f"{input_json}",
+    ]
+    schedule_task(["tsp", "sleep", "15m"])
+    schedule_task(register_request)

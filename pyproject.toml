@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "asset-registration-service"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "asset_registration_service"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+uvicorn = "^0.21.0"
+fastapi = "^0.94.1"
+python-decouple = "^3.8"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
