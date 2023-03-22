@@ -4,12 +4,11 @@ FROM base AS builder
 RUN apt-get update && apt-get -y upgrade
 RUN pip install poetry
 
-COPY . /asset_registration
-COPY poetry.lock pyproject.toml main.py /
+WORKDIR /usr/src/app
+COPY . /usr/src/app
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
-RUN poetry shell
 
 EXPOSE 8000:8000
 
