@@ -25,6 +25,11 @@ class RegisterRequest(BaseModel):
     contract: dict
 
 
+@app.get("/health")
+def health():
+    return {"health": "ok"}
+
+
 @app.post("/register_asset", status_code=201)
 async def register_asset_id(request_body: RegisterRequest):
     print(f" request_body: { request_body }")
