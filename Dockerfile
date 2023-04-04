@@ -5,7 +5,9 @@ RUN apt-get update && apt-get -y upgrade
 RUN pip install poetry
 
 WORKDIR /usr/src/app
-COPY . /usr/src/app
+COPY ./main.py /usr/src/app/main.py
+COPY ./poetry.lock /usr/src/app/poetry.lock
+COPY ./pyproject.toml /usr/src/app/pyproject.toml
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
