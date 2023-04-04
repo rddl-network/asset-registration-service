@@ -5,11 +5,16 @@ RUN apt-get update && apt-get -y upgrade
 RUN pip install poetry
 
 WORKDIR /usr/src/app
-COPY . /usr/src/app
+COPY ./main.py /usr/src/app/main.py
+COPY ./poetry.lock /usr/src/app/poetry.lock
+COPY ./pyproject.toml /usr/src/app/pyproject.toml
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
 EXPOSE 8000:8000
+
+RUN adduser --system --group nonroot
+USER nonroot
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "240", "--log-level=debug"]
