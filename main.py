@@ -1,12 +1,17 @@
 import json
 import subprocess
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from decouple import config
 
+
 ASSET_REG_URL: str = config("ASSET_REG_URL", default="https://assets.blockstream.info")
-LOCAL_STORAGE_LOCATION: str = config("LOCAL_STORAGE_LOCATION", default="/var/www/html")
+WELL_KNOWN_FOLDER: str = config("WELL_KNOWN_FOLDER", default="/var/www/html/.well-known")
 
 
 app = FastAPI()
@@ -19,6 +24,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/.well-known", StaticFiles(directory=f"{WELL_KNOWN_FOLDER}"), name="well-known")
+
+
+templates = Jinja2Templates(directory="templates")
+
 
 class RegisterRequest(BaseModel):
     asset_id: str
@@ -28,6 +38,15 @@ class RegisterRequest(BaseModel):
 @app.get("/health")
 def health():
     return {"health": "ok"}
+
+
+@app.get("/.well-known", response_class=HTMLResponse)
+def list_files(request: Request):
+    files = os.listdir(f"{WELL_KNOWN_FOLDER}")
+    files_paths = sorted([f"{request.url._url}/{f}" for f in files])
+    return templates.TemplateResponse(
+        "list_files.html", {"request": request, "files": files_paths}
+    )
 
 
 @app.post("/register_asset", status_code=201)
@@ -43,8 +62,8 @@ async def register_asset_id(request_body: RegisterRequest):
 
 def register_asset_id_local(asset_id: str):
     try:
-        f = open(f"{LOCAL_STORAGE_LOCATION}/.well-known/liquid-asset-proof-" + asset_id, "w")
-        f.write("Authorize linking the domain name lab.r3c.network to the Liquid asset " + asset_id)
+        f = open(f"{WELL_KNOWN_FOLDER}/liquid-asset-proof-" + asset_id, "w")
+        f.write("Authorize linking the domain name assets.rddl.io to the Liquid asset " + asset_id)
         f.close()
     except Exception as e:
         print(f"File Write execption: {e}")
