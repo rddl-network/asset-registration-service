@@ -44,7 +44,7 @@ async def register_asset_id(request_body: RegisterRequest):
 def register_asset_id_local(asset_id: str):
     try:
         f = open(f"{LOCAL_STORAGE_LOCATION}/.well-known/liquid-asset-proof-" + asset_id, "w")
-        f.write("Authorize linking the domain name lab.r3c.network to the Liquid asset " + asset_id)
+        f.write("Authorize linking the domain name assets.rddl.io to the Liquid asset " + asset_id)
         f.close()
     except Exception as e:
         print(f"File Write execption: {e}")
