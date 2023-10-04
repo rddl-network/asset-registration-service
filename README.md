@@ -1,4 +1,5 @@
 ```
+0. Make sure tsp (apt install task-spooler) is installed
 1. pipenv install --python 3.10 -> get the venv path
 2. edit the service file accordingly with the correct venv path and the user and group
 3. you might need to check pipenv location on the target device (which pipenv)
