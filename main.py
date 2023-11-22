@@ -55,7 +55,7 @@ async def register_asset_id(request_body: RegisterRequest, request: Request):
     print(f" TYPE : {isinstance(request_body.contract, dict)}")
     print(f" TYPE : {isinstance(request_body.contract, str)}")
     if register_asset_id_local(request_body.asset_id, str(request.url.netloc)):
-        print(f"File succesffully written: {request_body.asset_id}")
+        print(f"File successfully written: {request_body.asset_id}")
     register_asset_id_on_liquid(request_body.asset_id, request_body.contract)
     return {"asset_id": request_body.asset_id}
 
@@ -66,7 +66,7 @@ def register_asset_id_local(asset_id: str, netloc: str):
         f.write("Authorize linking the domain name " + netloc + " to the Liquid asset " + asset_id)
         f.close()
     except Exception as e:
-        print(f"File Write execption: {e}")
+        print(f"File Write exception: {e}")
         return False
     return True
 
